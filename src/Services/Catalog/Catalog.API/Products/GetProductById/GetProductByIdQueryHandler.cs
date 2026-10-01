@@ -9,24 +9,22 @@ public record GetProductByIdResult(Product Product);
 /// </summary>
 /// <param name="session"></param>
 /// <param name="logger"></param>
-internal class GetProductByIdQueryHandler(IDocumentSession session, ILogger<GetProductByIdQueryHandler> logger)
+internal class GetProductByIdQueryHandler(IDocumentSession session)
     : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
 {
     /// <summary>
     /// Handles the GetProductByIdQuery to retrieve a product by its ID.
     /// </summary>
-    /// <param name="request"></param>
+    /// <param name="query"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<GetProductByIdResult> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetProductByIdResult> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
     {
-        logger.LogInformation("GetProductByIdQuery.Handle for Product ID: {@ProductId}", request.Id);
-
-        var product = await session.LoadAsync<Product>(request.Id, cancellationToken);
+        var product = await session.LoadAsync<Product>(query.Id, cancellationToken);
 
         if (product is null)
         {
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(query.Id);
         }
 
         return new GetProductByIdResult(product);

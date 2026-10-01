@@ -18,18 +18,10 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
     }
 }
 
-internal class CreateProductHandler(IDocumentSession session, IValidator<CreateProductCommand> validator) : ICommandHandler<CreateProductCommand, CreateProductResult>
+internal class CreateProductHandler(IDocumentSession session): ICommandHandler<CreateProductCommand, CreateProductResult>
 {
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
-        var validation = validator.ValidateAsync(command, cancellationToken);
-        var errors = validation.Result.Errors.Select(x => x.ErrorMessage).ToList();
-
-        if (errors is { Count: > 1 })
-        {
-            throw new ValidationException(errors.FirstOrDefault());
-        }
-
         var product = new Product
         {
             Name = command.Name,
