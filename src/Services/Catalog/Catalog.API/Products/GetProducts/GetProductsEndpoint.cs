@@ -1,5 +1,9 @@
 ﻿namespace Catalog.API.Products.GetProducts;
 
+/// <summary>
+/// Represents the response for the GetProducts endpoint, containing a list of products.
+/// </summary>
+/// <param name="Products"></param>
 public record GetProductsResponse(IEnumerable<Product> Products);
 
 public class GetProductsEndpoint : ICarterModule

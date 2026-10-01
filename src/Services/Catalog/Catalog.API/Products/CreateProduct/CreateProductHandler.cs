@@ -1,18 +1,35 @@
-﻿namespace Catalog.API.Products.CreateProduct;
+﻿
+namespace Catalog.API.Products.CreateProduct;
 
 public record CreateProductCommand(Guid Id, string Name, List<string> Category, string Description, string ImageFile, decimal Price)
     : ICommand<CreateProductResult>;
 
 public record CreateProductResult(Guid Id);
 
-internal class CreateProductHandler(IDocumentSession session)
-    : ICommandHandler<CreateProductCommand, CreateProductResult>
+public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
+{
+    public CreateProductCommandValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Product name is required.");
+        RuleFor(x => x.Category).NotEmpty().WithMessage("Product category is required.");
+        RuleFor(x => x.Description).NotEmpty().WithMessage("Product description is required.");
+        RuleFor(x => x.ImageFile).NotEmpty().WithMessage("Product image file is required.");
+        RuleFor(x => x.Price).GreaterThan(0).WithMessage("Product price must be greater than zero.");
+    }
+}
+
+internal class CreateProductHandler(IDocumentSession session, IValidator<CreateProductCommand> validator) : ICommandHandler<CreateProductCommand, CreateProductResult>
 {
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
-        // Business logic per creare un prodotto
+        var validation = validator.ValidateAsync(command, cancellationToken);
+        var errors = validation.Result.Errors.Select(x => x.ErrorMessage).ToList();
 
-        // 1. create product entity from command object
+        if (errors is { Count: > 1 })
+        {
+            throw new ValidationException(errors.FirstOrDefault());
+        }
+
         var product = new Product
         {
             Name = command.Name,
@@ -22,11 +39,9 @@ internal class CreateProductHandler(IDocumentSession session)
             Price = command.Price
         };
 
-        // 2. save to database
         session.Store(product);
         await session.SaveChangesAsync(cancellationToken);
 
-        // 3. return result
         return new CreateProductResult(product.Id);
     }
 }
