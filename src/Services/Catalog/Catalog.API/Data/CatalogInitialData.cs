@@ -4,6 +4,12 @@ namespace Catalog.API.Data;
 
 public class CatalogInitialData : IInitialData
 {
+    /// <summary>
+    /// Populates the database with initial data if the Product collection is empty.
+    /// </summary>
+    /// <param name="store"></param>
+    /// <param name="cancellation"></param>
+    /// <returns></returns>
     public async Task Populate(IDocumentStore store, CancellationToken cancellation)
     {
         using var session = store.LightweightSession();
@@ -15,9 +21,13 @@ public class CatalogInitialData : IInitialData
         await session.SaveChangesAsync(cancellation);
     }
 
-
-    private static IEnumerable<Product> GetPreconfiguredProducts() =>
-    [
+    /// <summary>
+    /// Returns a collection of preconfigured products to populate the database with initial data.
+    /// </summary>
+    /// <returns></returns>
+    private static IEnumerable<Product> GetPreconfiguredProducts()
+    {
+        return [
         new Product()
         {
             Id = new Guid("5334c996-8457-4cf0-815c-ed2b77c4ff61"),
@@ -82,4 +92,5 @@ public class CatalogInitialData : IInitialData
             Category = ["Camera"]
         }
     ];
+    }
 }
