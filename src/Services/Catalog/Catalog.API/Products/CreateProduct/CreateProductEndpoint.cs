@@ -15,12 +15,12 @@ public class CreateProductEndpoint : ICarterModule
         app.MapPost("/products", async (CreateProductRequest request, ISender sender) =>
         {
             // convert the request to a command using Mapster
-            var command = request.Adapt<CreateProductCommand>();
             // send the command to the handler using MediatR
-            var result = await sender.Send(command);
             // convert the result to a response using Mapster
+            // return a 201 response with the location of the new product
+            var command = request.Adapt<CreateProductCommand>();
+            var result = await sender.Send(command);
             var reponse = result.Adapt<CreateProductResponse>();
-            // return a 201 Created response with the location of the new product
             return Results.Created($"/products/{reponse.Id}", reponse);
         })
         .WithName("CreateProduct")
