@@ -34,7 +34,6 @@ public class Order : Aggregate<OrderId>
         return order;
     }
 
-
     public void Update(OrderName orderName, Address shippingAddress, Address billingAddress, Payment payment, OrderStatus status)
     {
         OrderName = orderName;
