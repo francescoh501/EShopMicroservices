@@ -57,7 +57,8 @@ public class CustomExceptionHandler(ILogger<CustomExceptionHandler> logger) : IE
         {
             Title = Title,
             Detail = Detail,
-            Status = StatusCode
+            Status = StatusCode,
+            Instance = httpContext.Request.Path
         };
 
         problemDetails.Extensions.Add("traceId", httpContext.TraceIdentifier);
